@@ -535,14 +535,20 @@ const App = () => {
     const [isMuted, setIsMuted] = useState(false);
     const [volumeLevel, setVolumeLevel] = useState(2);
 
+    useEffect(() => {
+        if (isMuted && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+    }, [isMuted]);
+
     const handleMuteToggle = () => {
-        setIsMuted(prev => {
-            if (!prev && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-            }
-            return !prev;
-        });
+        const nextMuted = !isMuted;
+        if (nextMuted && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+        setIsMuted(nextMuted);
     };
+
     const handleVolumeChange = (level: number) => {
         if (isMuted) setIsMuted(false);
         setVolumeLevel(level);
@@ -630,3 +636,6 @@ if (container) {
     const root = createRoot(container);
     root.render(<App />);
 }
+
+
+
